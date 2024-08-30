@@ -53,8 +53,6 @@ ListaDoble* crearLista() {
 
 void pushFront(ListaDoble* lista) {
     Nodo* nodo = crearNodo();
-    Blog* nodoBlog = crearBlog();
-    nodo->blog = nodoBlog;
     if (lista->head == NULL) {
         lista->tail = nodo;
     } else {
@@ -67,8 +65,6 @@ void pushFront(ListaDoble* lista) {
 
 void pushBack(ListaDoble* lista) {
     Nodo* nodo = crearNodo();
-    Blog* nodoBlog = crearBlog();
-    nodo->blog = nodoBlog;
     if (lista->tail == NULL) {
         lista->head = nodo;
     } else {
@@ -86,8 +82,6 @@ void pushPos(ListaDoble* lista, int pos) {
         pushBack(lista);
     } else {
         Nodo* nodo = crearNodo();
-        Blog* nodoBlog = crearBlog();
-        nodo->blog = nodoBlog;
         Nodo* ant = buscarNodo(lista, pos-1);
         if (ant != NULL) {
             nodo->sig = ant->sig;
@@ -187,27 +181,41 @@ ListaDoble* ordenarLista(ListaDoble* lista) {
     return lista;
 }
 
-int borrarPos(ListaDoble *lista, int pos){
-    if(pos == 0){
-        Nodo *temp = lista->head->sig;
-        free(lista->head->blog);
-        free(lista->head);
-        lista->head = temp;
-        lista->size--;
-        return 1;
+int borrarPos(ListaDoble *lista, int pos) {
+    if (pos < 0 || pos >= lista->size) {
+        return 0;
     }
-    Nodo *temp1;
-    temp1 = buscarNodo(lista, pos-1);
+
     Nodo *nodoAborrar = buscarNodo(lista, pos);
-    temp1->sig = nodoAborrar->sig;
-    free(nodoAborrar->blog);
-    free(nodoAborrar);
-    if(pos == lista->size-1){
-        lista->tail = temp1;
+
+    if (nodoAborrar == NULL) {
+        return 0;
     }
+
+    if (nodoAborrar == lista->head) {
+        lista->head = nodoAborrar->sig;
+        if (lista->head != NULL) {
+            lista->head->prev = NULL;
+        }
+    } else {
+        nodoAborrar->prev->sig = nodoAborrar->sig;
+    }
+
+    if (nodoAborrar == lista->tail) {
+        lista->tail = nodoAborrar->prev;
+        if (lista->tail != NULL) {
+            lista->tail->sig = NULL;
+        }
+    } else {
+        nodoAborrar->sig->prev = nodoAborrar->prev;
+    }
+
+    liberarNodo(nodoAborrar);
     lista->size--;
+
     return 1;
 }
+
 
 ListaDoble* veinteLetras(ListaDoble* lista) {
     Nodo* actual = lista->head;
